@@ -1,0 +1,375 @@
+﻿@using FlowerShop.Models
+@{
+    ViewBag.Title = "Flower Shop | Trang chủ";
+}
+
+@{ 
+    List<Product> products = ViewBag.products;
+    List<DiscountProduct> discountList = ViewBag.discountProducts;
+    discountList.Reverse();
+    var discountProducts = products.Where(pro => discountList.Take(2).Any(dis => dis.ProductId == pro.Id));
+}
+
+@{ 
+    List<Category> categories = ViewBag.categories;
+    List<ProductCategory> productCategories = ViewBag.productCategories;
+
+    Category graduationCategory = categories.Find(c => c.CategoryName == "Hoa tốt nghiệp");
+    var graduationFlowerCategories = productCategories.Where(proCate => proCate.CategoryId == graduationCategory.Id);
+    var graduationFlowers = products.Where(pro => graduationFlowerCategories.Take(8).Any(grad => grad.ProductId == pro.Id));
+
+    Category weddingCategory = categories.Find(c => c.CategoryName == "Hoa cưới");
+    var weddingFlowerCategories = productCategories.Where(proCate => proCate.CategoryId == weddingCategory.Id);
+    var weddingFlowers = products.Where(pro => weddingFlowerCategories.Take(8).Any(p => p.ProductId == pro.Id));
+
+    Category giftCategory = categories.Find(c => c.CategoryName == "Quà tặng");
+    var giftFlowerCategories = productCategories.Where(proCate => proCate.CategoryId == giftCategory.Id);
+    var giftFlowers = products.Where(pro => giftFlowerCategories.Take(4).Any(p => p.ProductId == pro.Id));
+}
+
+<style>
+        @@media (max-width: 1199px) {
+            #banner-wrapper {
+                height: auto !important;
+            }
+
+            .h-60-per > img {
+                height: 300px !important;
+            }
+        }
+
+        @@media (min-width: 576px) and (max-width: 767px) {
+            .h-60-per > img {
+                height: 200px !important;
+            }
+        }
+        @@media (max-width: 575px) {
+            .h-60-per > img {
+                height: 180px !important;
+            }
+        }
+</style>
+
+<section id="banner-wrapper" class="row" style="height: 330px">
+    <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-8 h-100">
+        <div id="slider" class="carousel slide h-100" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#slider" data-bs-slide-to="0" class="active"
+                        aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#slider" data-bs-slide-to="1"
+                        aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#slider" data-bs-slide-to="2"
+                        aria-label="Slide 3"></button>
+                <button type="button" data-bs-target="#slider" data-bs-slide-to="3"
+                        aria-label="Slide 4"></button>
+            </div>
+            <div class="carousel-inner h-100">
+                <a class="carousel-item rounded-20 overflow-hidden h-100 active" href="/Product/Detail/17">
+                    <img src="~/Assets/Images/banner6.gif"
+                         class="d-block object-fit-cover h-100 w-100" alt="Camera" />
+                </a>
+                <a class="carousel-item rounded-20 overflow-hidden h-100 " href="/Product/Shop/@giftCategory.Id">
+                    <img src="~/Assets/Images/banner7.gif"
+                         class="d-block object-fit-cover h-100 w-100" alt="Camera" />
+                </a>
+                <div class="carousel-item rounded-20 overflow-hidden  h-100 ">
+                    <img src="~/Assets/Images/banner9.gif"
+                         class="d-block object-fit-cover h-100 w-100" alt="Wild Landscape" />
+                </div>
+
+                <a  class="carousel-item rounded-20 overflow-hidden h-100" href="/Product/Shop/1">
+                    <img src="~/Assets/Images/banner8.gif"
+                         class="d-block object-fit-cover h-100 w-100" alt="Camera" />
+                </a>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#slider"
+                    data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#slider"
+                    data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+    <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-4 h-100 mt-4 mt-xl-0">
+        <div class="row h-100">
+            @foreach (var product in discountProducts)
+            {
+                <div class="col-6 h-100">
+                    <div class="card rounded-30 p-3 h-100">
+                        <a class="h-60-per position-relative" href="/Product/Detail/@product.Id">
+                            <img src="~/Assets/ImageStorage/Products/@product.Image"
+                                 class="card-img-top rounded-20 h-100 object-fit-cover" alt="..." />
+                            @if (product.Quantity == 0)
+                            {
+                                <span style="top: 2px; right: 2px;" class="position-absolute px-3 py-2 rounded-pill shadow bg-grey border">
+                                    Bán hết
+                                </span>
+                            }
+                        </a>
+                        <div class="d-flex flex-column justify-content-end flex-grow-1">
+                            <div>
+                                <h5 class="card-title mb-1 text-truncate">
+                                    @product.Name
+                                </h5>
+
+                                <p class="text-primary mb-2">
+                                    @{ decimal disPrice = 0; }
+                                    @foreach(var dis in discountList) {
+                                        if(dis.ProductId == product.Id) {
+                                            disPrice = dis.DiscountPrice;
+                                            <span>@String.Format("{0:N}", dis.DiscountPrice) đ</span>
+                                        }
+                                    }
+                                    &nbsp;
+                                    <span data-dis-price="@disPrice" class="text-decoration-line-through text-muted">@String.Format("{0:N}", product.Price) đ</span>
+                                </p>
+                            </div>
+
+                            <button @(product.Quantity == 0 ? "disabled" : null) data-id="@product.Id" class="add-to-cart btn text-white bg-primary rounded-pill">
+                                Thêm vào giỏ hàng
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            }
+        </div>
+    </div>
+</section>
+
+<section class="mt-5 text-center">
+    <h2 style="font-size: 40px;" class="font-heading-decor">Flowers Make The Moment</h2>
+    <p class="mt-2">
+        Adding colors to your
+        special moments. <img width="40px" height="40px"
+                              src="~/Assets/Images/sun.gif" alt="">
+    </p>
+    <a href="/Product/Shop/0" class="mt-3 px-4 btn btn-lg bg-primary text-white rounded-pill">Shop now</a>
+</section>
+
+<section class="mt-5 mb-5">
+    <div class="mb-3 d-flex align-items-center justify-content-between">
+        <h4 class="fs-2">Hoa theo chủ đề</h4>
+        <a href="/Product/Shop/0" class="text-primary">Xem thêm danh mục</a>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <div class="position-relative rounded-10 h-100 overflow-hidden">
+                <a href="/Product/Shop/1">
+                    <img class="w-100 h-100 object-fit-cover filter-grayscale-60"
+                         src="~/Assets/Images/birthday-category.jpg"                                                                                                                                                                                                                                                                  
+                         alt="">
+                </a>
+                <h5 class="position-absolute p-2 m-3 rounded-10 bottom-0 start-0 text-black bg-white fs-5">
+                    Sinh nhật
+                </h5>
+
+            </div>
+        </div>
+        <div class="col-4 h-100">
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <div class="position-relative rounded-10 h-100 overflow-hidden">
+                        <a href="/Product/Shop/7">
+                            <img class="w-100 filter-grayscale-60"
+                                 src="~/Assets/Images/graduation-category.jpg"
+                                 alt="">
+                        </a>
+                        <h5 class="position-absolute p-2 m-3 rounded-10 top-0 start-0 text-black bg-white fs-5">
+                            Tốt
+                            nghiệp
+                        </h5>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="position-relative rounded-10 h-100 overflow-hidden">
+                        <a href="/Product/Shop/6">
+                            <img class="w-100 filter-grayscale-60"
+                                 src="~/Assets/Images/love-category.jpg"
+                                 alt="">
+                        </a>
+                        <h5 class="position-absolute p-2 m-3 rounded-10 top-0 start-0 text-black bg-white mb-2 fs-5">
+                            Tình yêu
+                        </h5>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="position-relative rounded-10 h-100 overflow-hidden">
+                <a href="/Product/Shop/8">
+                    <img class="w-100 h-100 object-fit-cover filter-grayscale-60"
+                         src="~/Assets/Images/memory-category.jpg"
+                         alt="">
+                </a>
+                <h5 class="position-absolute p-2 m-3 rounded-10 bottom-0 end-0 text-black bg-white fs-5">
+                    Kỷ niệm
+                </h5>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mt-5">
+    <div class="d-flex justify-content-center align-items-center mb-4">
+        <h4 class="fs-2 text-center me-3">
+            Hoa tốt nghiệp
+        </h4>
+        <img width="40" src="~/Assets/Images/graduation-icon.png" />
+    </div>
+    
+    <div class="row">
+        @foreach (var product in graduationFlowers)
+        {
+            <div class="col-6 col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-4">
+                <div class="card rounded-30 p-3">
+                    <a class="card-img-wrapper position-relative" href="/Product/Detail/@product.Id">
+                        <img src="~/Assets/ImageStorage/Products/@product.Image"
+                             class="card-img-top rounded-20 h-100 object-fit-cover" alt="..." />
+                        @if (product.Quantity == 0)
+                        {
+                            <span style="top: 2px; right: 2px;" class="position-absolute px-3 py-2 rounded-pill shadow bg-grey border">
+                                Bán hết
+                            </span>
+                        }
+                    </a>
+                    <div class="d-flex flex-column justify-content-end flex-grow-1 mt-2">
+                        <div>
+                            <h5 class="card-title mb-1 text-truncate">
+                                @product.Name
+                            </h5>
+
+                            <p class="text-primary mb-2">
+                                @{ bool isDiscounted = false; }
+                                @foreach (var dis in ViewBag.discountProducts)
+                                {
+                                    if (dis.ProductId == product.Id)
+                                    {
+                                        <span>@String.Format("{0:N}", dis.DiscountPrice) đ</span>
+                                        isDiscounted = true;
+                                    }
+                                }
+                                <span class="@(isDiscounted ? "ms-2 text-decoration-line-through text-muted" : "text-primary") ">@String.Format("{0:N}", product.Price) đ</span>
+                            </p>
+                        </div>
+
+                        <button @(product.Quantity == 0 ? "disabled" : null) data-id="@product.Id" class="add-to-cart btn text-white bg-primary rounded-pill">
+                            Thêm vào giỏ hàng
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+<section class="mt-5">
+    <div class="d-flex justify-content-center align-items-center mb-4">
+        <h4 class="fs-2 text-center me-3">
+            Hoa cưới
+        </h4>
+        <img width="40" src="~/Assets/Images/wedding-icon.png" />
+    </div>
+    <div class="row">
+        @foreach (var product in weddingFlowers)
+        {
+            <div class="col-6 col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-4">
+                <div class="card rounded-30 p-3">
+                    <a class="card-img-wrapper position-relative" href="/Product/Detail/@product.Id">
+                        <img src="~/Assets/ImageStorage/Products/@product.Image"
+                             class="card-img-top rounded-20 h-100 object-fit-cover" alt="..." />
+                        @if (product.Quantity == 0)
+                        {
+                            <span style="top: 2px; right: 2px;" class="position-absolute px-3 py-2 rounded-pill shadow bg-grey border">
+                                Bán hết
+                            </span>
+                        }
+                    </a>
+                    <div class="d-flex flex-column justify-content-end flex-grow-1 mt-2">
+                        <div>
+                            <h5 class="card-title mb-1 text-truncate">
+                                @product.Name
+                            </h5>
+
+                            <p class="text-primary mb-2">
+                                @{ bool isDiscounted = false; }
+                                @foreach (var dis in ViewBag.discountProducts)
+                                {
+                                    if (dis.ProductId == product.Id)
+                                    {
+                                        <span>@String.Format("{0:N}", dis.DiscountPrice) đ</span>
+                                        isDiscounted = true;
+                                    }
+                                }
+                                <span class="@(isDiscounted ? "ms-2 text-decoration-line-through text-muted" : "text-primary") ">@String.Format("{0:N}", product.Price) đ</span>
+                            </p>
+                        </div>
+
+                        <button @(product.Quantity == 0 ? "disabled" : null) data-id="@product.Id" class="add-to-cart btn text-white bg-primary rounded-pill">
+                            Thêm vào giỏ hàng
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+<section class="mt-5">
+    <div class="d-flex justify-content-center align-items-center mb-4">
+        <h4 class="fs-2 text-center me-3">
+            Quà tặng
+        </h4>
+        <img width="40" src="~/Assets/Images/gift-icon.png" />
+    </div>
+
+    <div class="row">
+        @foreach (var product in giftFlowers)
+        {
+            <div class="col-6 col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-4">
+                <div class="card rounded-30 p-3">
+                    <a class="card-img-wrapper position-relative" href="/Product/Detail/@product.Id">
+                        <img src="~/Assets/ImageStorage/Products/@product.Image"
+                             class="card-img-top rounded-20 h-100 object-fit-cover" alt="..." />
+                        @if (product.Quantity == 0)
+                        {
+                            <span style="top: 2px; right: 2px;" class="position-absolute px-3 py-2 rounded-pill shadow bg-grey border">
+                                Bán hết
+                            </span>
+                        }
+                    </a>
+                    <div class="d-flex flex-column justify-content-end flex-grow-1 mt-2">
+                        <div>
+                            <h5 class="card-title mb-1 text-truncate">
+                                @product.Name
+                            </h5>
+
+                            <p class="text-primary mb-2">
+                                @{ bool isDiscounted = false; }
+                                @foreach (var dis in ViewBag.discountProducts)
+                                {
+                                    if (dis.ProductId == product.Id)
+                                    {
+                                        <span>@String.Format("{0:N}", dis.DiscountPrice) đ</span>
+                                        isDiscounted = true;
+                                    }
+                                }
+                                <span class="@(isDiscounted ? "ms-2 text-decoration-line-through text-muted" : "text-primary") ">@String.Format("{0:N}", product.Price) đ</span>
+                            </p>
+                        </div>
+
+                        <button @(product.Quantity == 0 ? "disabled" : null) data-id="@product.Id" class="add-to-cart btn text-white bg-primary rounded-pill">
+                            Thêm vào giỏ hàng
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+

@@ -1,0 +1,125 @@
+﻿.card-img-wrapper {
+    height: 250px;
+}
+
+.cart-item-height {
+    height: 140px;
+}
+.cart-item-select {
+    color: transparent;
+    background: #fff;
+}
+
+.cart-item-select:hover {
+    color: transparent !important;
+}
+
+.cart-item-select.active:hover {
+    color: #fff !important;
+}
+
+.date-label.active,
+.time-label.active {
+    border-color: var(--primary) !important;
+}
+
+
+.cart-item-select.active {
+    background-color: var(--primary);
+    color: #fff;
+    font-size: 20px;
+}
+
+.bagde-status {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+}
+
+    .bagde-status > i {
+        margin-right: 7px;
+    }
+
+.bagde-status-success {
+    background-color: #d9f8eb;
+    color: #00894f;
+}
+
+.bagde-status-processing {
+    background-color: #d9e7fa;
+    color: #215cac;
+}
+
+.bagde-status-cancel {
+    background-color: #ffded7;
+    color: #ff3f00;
+}
+
+.bagde-status-pending {
+    background-color: #F5F5F7;
+    color: #2e2828;
+}
+
+.bagde-status-shipping {
+    background-color: #fff2d8;
+    color: #ffb200;
+}
+
+
+
+/* Shop page*/
+#shop-pagination-bar .page-link {
+    z-index: 1;
+}
+
+#shop-pagination-bar .page-item a {
+    color: #000;
+    box-shadow: none !important;
+}
+
+#shop-pagination-bar .page-item.active a {
+    border-color: var(--primary) !important;
+    color: #fff !important;
+    background-color: var(--primary);
+}
+
+
+/*#shop-pagination-bar li.page-item {
+    display: none;
+}*/
+
+/*#shop-pagination-bar .page-item:first-child,
+#shop-pagination-bar .page-item:nth-child(2),
+#shop-pagination-bar .page-item:nth-child(3),
+#shop-pagination-bar .page-item:nth-last-child(-n+3),*/
+/*#shop-pagination-bar .page-item:last-child,*/
+/*#shop-pagination-bar .page-item.active,
+#shop-pagination-bar .page-item.disabled
+{
+    display: block;
+}*/
+
+#shop-pagination-bar .page-item.three-dot {
+    display: block !important;
+}
+
+
+#user-orders .nav-item {
+    background-color: transparent;
+}
+
+#user-orders .nav-item .nav-link {
+    min-width: 141px;
+    color: #333;
+    padding: 10px 20px;
+    border: none;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+}
+
+
+#user-orders .nav-item .nav-link.active {
+    color: var(--primary);
+    background-color: transparent;
+    border-color: var(--primary);
+}

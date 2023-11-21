@@ -1,0 +1,101 @@
+﻿@model FlowerShop.Models.Product
+
+@{
+    ViewBag.Title = "Admin | Thêm sản phẩm";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+@if (TempData["alert-error"] != null)
+{
+    <div class="d-flex align-items-center justify-content-between alert alert-danger" role="alert">
+        <span>@TempData["alert-error"]</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<h4>Thêm sản phẩm</h4>
+
+<nav aria-label="breadcrumb" class="mt-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item "><a href="/Admin/Home/Index">Trang chủ</a></li>
+        <li class="breadcrumb-item "><a href="/Admin/Product/Index">Sản phẩm</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Thêm sản phẩm</li>
+    </ol>
+</nav>
+
+@using (Html.BeginForm("Create", "Product", FormMethod.Post, new { enctype = "multipart/form-data", id = "admin-form-inputs", @class = "mt-4" }))
+{
+    <div class="row">
+        <div class="col-7">
+            <div class="p-4 bg-grey rounded-10 mb-4">
+                <div class="form-outline flex-fill mb-3">
+                    <div class="row">
+                        <div class="col-6">
+                            <label class="form-label" for="form3Example3c">Tên sản phẩm</label>
+                            <input name="Name" type="text" class="form-control shadow-none" />
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" for="form3Example3c">Trạng thái</label>
+                            <select name="Status" class="form-select shadow-none" aria-label="Default select example">
+                                <option value="Còn" selected>Còn</option>
+                                <option value="Hết">Hết</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-6">
+                        <div class="form-outline flex-fill">
+                            <label class="form-label" for="form3Example3c">Giá</label>
+                            <input name="Price" type="text" class="form-control shadow-none" />
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-outline flex-fill">
+                            <label class="form-label" for="form3Example3c">Số lượng</label>
+                            <input name="Quantity" min="0" type="number" class="form-control shadow-none" />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-outline flex-fill">
+                    <label class="form-label" for="form3Example3c">Viết mô tả</label>
+                    <textarea name="Description" class="form-control shadow-none" id="exampleFormControlTextarea1" rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-5">
+            <div class="p-4 bg-grey rounded-10 mb-4">
+                <div class="form-outline flex-fill mb-3">
+                    <label class="form-label" for="form3Example3c">Danh mục</label>
+                    <select name="CategoryId" class="form-select shadow-none" aria-label="Default select example">
+                        @foreach (var categoryItem in ViewBag.CategoryList)
+                        {
+                            <option value="@categoryItem.Id">@categoryItem.CategoryName</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-outline flex-fill">
+                    <label class="form-label" for="form3Example3c">Nhà cung cấp</label>
+                    <select name="SupplierId" class="form-select shadow-none" aria-label="Default select example">
+                        @foreach (var supplierItem in ViewBag.SupplierList)
+                        {
+                            <option value="@supplierItem.Id">@supplierItem.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="p-4 bg-grey rounded-10 mb-4">
+                <div class="form-outline flex-fill">
+                    <label class="form-label" for="form3Example3c">Chọn hình ảnh</label>
+                    <input name="ImageFile" class="form-control shadow-none" type="file" accept=".jpg,.gif,.png" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-3 rounded-10 shadow-sm border d-flex align-items-center justify-content-between">
+        <h5>Hoàn thành !</h5>
+        <button type="submit" class="btn btn btn-dark">Thêm sản phẩm</button>
+    </div>
+}

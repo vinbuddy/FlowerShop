@@ -1,0 +1,106 @@
+﻿@model FlowerShop.Models.Product
+
+@{
+    ViewBag.Title = "Detail";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex align-items-center justify-content-between">
+    <h4>Chi tiết sản phẩm</h4>
+    <a href="">
+        <i class='bx bx-pencil'></i>
+        Chỉnh sửa
+    </a>
+</div>
+
+<nav aria-label="breadcrumb" class="mt-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item "><a href="/Admin/Home/Index">Trang chủ</a></li>
+        <li class="breadcrumb-item "><a href="/Admin/Product/Index">Sản phẩm</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Chi tiết sản phẩm</li>
+    </ol>
+</nav>
+
+
+<div class="mt-4">
+    <div class="row">
+        <div class="col-6">
+            <div class="p-4">
+                <div class="border-bottom">
+                    <img class="mx-auto d-block rounded-10 pb-4"
+                         width="250px"
+                         src="~/Assets/ImageStorage/Products/@Model.Image"
+                         alt="">
+                </div>
+                <div class="0 mt-4">
+                    <h5 class="mb-3">Id: @Model.Id</h5>
+                    <h5 class="mb-3">@Model.Name</h5>
+
+                    <label for="">Mô tả sản phẩm:</label>
+                    <p class="text-muted p-3 bg-grey rounded-10 mt-2">
+                        @Model.Description
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="p-4">
+                <div class="mb-4">
+                    <h6 for="">Giá gốc:</h6>
+                    <p class="px-3 py-2 mt-2 rounded-10 bg-grey">@String.Format("{0:N}", Model.Price) đ</p>
+                </div>
+                <div class="mb-4">
+                    <h6 for="">Giá đang giảm: </h6>
+                    <p class="text-success px-3 py-2 mt-2 rounded-10 bg-grey">
+                        @{ decimal discountPrice = 0; }
+                        @foreach (var discountProd in ViewBag.DiscountProducts)
+                        {
+                            if (Model.Id == discountProd.ProductId)
+                            {
+                                discountPrice = discountProd.DiscountPrice;
+                                <span class="ms-1 text-success">
+                                    @String.Format("{0:N}", discountPrice) đ
+                                </span>
+                                break;
+                            }
+                        }
+
+                        @if (discountPrice == 0)
+                        {
+                            <span class="ms-1 text-success">
+                                @discountPrice đ
+                            </span>
+                        }
+                    </p>
+                </div>
+                <div class="mb-4">
+                    <h6 for="">Số lượng:</h6>
+                    <p class="px-3 py-2 mt-2 rounded-10 bg-grey">@Model.Quantity</p>
+                </div>
+                <div class="mb-4">
+                    <h6 for="">Trạng thái:</h6>
+                    <p class="px-3 py-2 mt-2 rounded-10 bg-grey">@Model.Status</p>
+                </div>
+                <div class="mb-4">
+                    <h6 for="">Nhà cung câp</h6>
+                    <p class="px-3 py-2 mt-2 rounded-10 bg-grey">
+                        @foreach (var sup in ViewBag.SupplierList)
+                        {
+                            if (sup.Id == Model.SupplierId)
+                            {
+                                <span class="d-block mb-1">@sup.Name</span>
+                                <span class="d-block mb-1">@sup.PhoneNumber</span>
+                                <span class="d-block mb-1">@sup.Address</span>
+                            }
+                        }
+
+                    </p>
+                </div>
+                <div>
+                    <h6 for="">Danh mục</h6>
+                    <p class="px-3 py-2 mt-2 rounded-10 bg-grey">@ViewBag.category</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

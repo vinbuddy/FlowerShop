@@ -1,0 +1,218 @@
+﻿@model IEnumerable<FlowerShop.Models.Order>
+@{
+    ViewBag.Title = "Orders";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h4>Các đơn hàng</h4>
+
+<div class="row mt-4 mb-5">
+    @{
+        int statusProcessingQuantity = 0;
+        int statusPendingQuantity = 0;
+        int statusSuccessQuantity = 0;
+        int statusCancelQuantity = 0;
+        int statusShippingQuantity = 0;
+    }
+
+    @foreach (var status in ViewBag.orderStatusList)
+    {
+        switch (status.StatusName)
+        {
+            case "Hoàn thành":
+                statusSuccessQuantity = status.StatusQuantity;
+                break;
+            case "Đang chờ":
+                statusPendingQuantity = status.StatusQuantity;
+                break;
+            case "Đang xử lý":
+                statusProcessingQuantity = status.StatusQuantity;
+                break;
+            case "Đang giao":
+                statusShippingQuantity = status.StatusQuantity;
+                break;
+            case "Đã hủy":
+                statusCancelQuantity = status.StatusQuantity;
+                break;
+            default:
+                break;
+        }
+    }
+    <div class="col-2">
+        <a class="d-block h-100 p-3 rounded-10 bg-dark" href="/Admin/Order/Index?status=all">
+            <h6 class="text-white">
+                Tất cả
+            </h6>
+            <p class="text-white fw-bold fs-4 mt-2 ">@Model.Count()</p>
+        </a>
+    </div>
+    <div class="col-2">
+        <a class="d-block h-100 p-3 rounded-10 bagde-status-processing" href="/Admin/Order/Index?status=processing">
+            <h6>
+                Đang xử lý
+            </h6>
+            <p class="fw-bold fs-4 mt-2 ">@statusProcessingQuantity</p>
+        </a>
+    </div>
+    <div class="col-2">
+        <a class="d-block h-100 p-3 rounded-10 bagde-status-shipping" href="/Admin/Order/Index?status=shipping">
+            <h6>
+                Đang giao
+            </h6>
+            <p class="fw-bold fs-4 mt-2 ">@statusShippingQuantity</p>
+        </a>
+
+    </div>
+    <div class="col-2">
+        <a class="d-block h-100 p-3 rounded-10 bagde-status-pending" href="/Admin/Order/Index?status=pending">
+            <h6>
+                Đang chờ
+            </h6>
+            <p class="fw-bold fs-4 mt-2 ">@statusPendingQuantity</p>
+        </a>
+
+    </div>
+    <div class="col-2">
+        <a class="d-block h-100 p-3 rounded-10 bagde-status-success" href="/Admin/Order/Index?status=success">
+            <h6>
+                Hoàn thành
+            </h6>
+            <p class="fw-bold fs-4 mt-2 ">@statusSuccessQuantity</p>
+        </a>
+
+    </div>
+    <div class="col-2">
+        <a class="d-block h-100 p-3 rounded-10 bagde-status-cancel" href="/Admin/Order/Index?status=cancel">
+            <h6>
+                Đã hủy
+            </h6>
+            <p class="fw-bold fs-4 mt-2 ">@statusCancelQuantity</p>
+        </a>
+
+    </div>
+
+</div>
+
+<div id="admin-table-list">
+    <table class="table mt-4">
+        <thead class="bg-grey">
+            <tr>
+                <th class="border-transparent" scope="col">Mã đơn</th>
+                <th class="border-transparent" scope="col">Khách hàng</th>
+                <th class="border-transparent" scope="col">Ngày đặt</th>
+                <th class="border-transparent" scope="col">Ngày giao</th>
+                <th class="border-transparent" scope="col">Tổng tiền</th>
+                <th class="border-transparent" scope="col">Trạng thái</th>
+                <th class="border-transparent" scope="col">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in Model)
+            {
+                <tr>
+                    <td>
+                        <span class="text-muted"> #@order.Id</span>
+                    </td>
+                    <td>
+                        @foreach(var user in ViewBag.users) { 
+                            if(user.Id == order.UserId) { 
+                                @user.UserName <br>
+                                <a href="" class="text-decoration-underline text-desc">@user.Email</a>
+                            }
+                        }
+                        
+                    </td>
+                    <td>
+                        @order.OrderDate
+                    </td>
+                    <td>
+                        @order.ReceiveDate
+
+                    </td>
+
+                    <td>
+                        @String.Format("{0:N}", order.TotalPayment) đ
+                    </td>
+                    <td>
+                        @{ 
+                            string statusColor = "";
+                            string statusIcon = "";
+
+                            switch (order.Status.Trim()) {
+                                case "Hoàn thành":
+                                    statusColor = "bagde-status-success";
+                                    statusIcon = "bx-check";
+                                    break;
+                                case "Đang chờ":
+                                    statusColor = "bagde-status-pending";
+                                    statusIcon = "bx-time-five";
+                                    break;
+                                case "Đang xử lý":
+                                    statusColor = "bagde-status-processing";
+                                    statusIcon = "bxs-bolt";
+                                    break;
+                                case "Đang giao":
+                                    statusColor = "bagde-status-shipping";
+                                    statusIcon = "bxs-truck";
+                                    break;
+                                case "Đã hủy":
+                                    statusColor = "bagde-status-cancel";
+                                    statusIcon = "bxs-x-circle";
+                                    break;
+                                default:
+                                    break;
+                            }
+                         }
+                        <span class="bagde-status @statusColor px-2 py-1 rounded-5">
+                            <i class='text-size-small bx @statusIcon'></i> @order.Status
+                        </span>
+                    </td>
+                    <td>
+                        <a href="/Admin/Order/OrderDetail/@order.Id" class="bg-secondary btn-sm rounded-4 me-2" data-bs-toggle="tooltip"
+                           data-bs-placement="left" title="Chi tiết đơn hàng">
+                            <i class='bx bx-show'></i>
+                        </a>
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @*<nav class="d-flex justify-content-end mt-4" aria-label="Page navigation example">
+        <ul class="pagination">
+            <li class="page-item">
+                <a class="page-link" href="#">
+                    <i class='bx bx-chevron-left'></i>
+
+                </a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#">
+                    <i class='bx bx-chevron-right'></i>
+
+                </a>
+            </li>
+        </ul>
+    </nav>*@
+</div>
+
+@section Scripts {
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>*@
+    <script type="text/javascript">
+        // If you do not want to use jQuery you can use Pure JavaScript. See FAQ below
+        $(document).ready(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+
+            // Init popover
+            const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+            const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
+        });
+    </script>
+
+}
+

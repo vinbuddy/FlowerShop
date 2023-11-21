@@ -1,0 +1,47 @@
+﻿
+@{
+    ViewBag.Title = "ShowCart";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item "><a href="/Home/Index">Trang chủ</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Giỏ hàng</li>
+    </ol>
+</nav>
+@if(Session["User"] != null) { 
+<div class="row">
+    <div class="col-8">
+        <div>
+            <h4 class="mb-5 text-center text-dark">Giỏ hàng của bạn</h4>
+            <ul id="cart-list">
+                @* Render cart item *@
+            </ul>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="rounded-10 shadow p-4 border">
+            <p class="mb-3">
+                Tổng tiền thanh toán: <b id="total-payment">0 </b> <b>Đ</b>
+            </p>
+            <button id="checkout-btn" class="w-100 btn bg-primary text-white">
+                Mua hàng
+            </button>
+        </div>
+
+    </div>
+</div>
+} else { 
+<div style="min-height: 300px" class="d-flex align-items-center justify-content-center">
+    <div class="d-flex flex-column align-items-center">
+        <img width="500" style="filter: grayscale(1)" src="~/Assets/Images/login-placeholder.png" />
+        <a href="/Account/Login" class="btn btn-lg bg-secondary text-dark border">Đăng nhập để sử dụng</a>
+    </div>
+</div>
+}
+
+
+@section Scripts {
+    <script type="module" src="~/JS/Cart.js"></script>    
+}

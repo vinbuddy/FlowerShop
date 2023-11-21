@@ -1,0 +1,123 @@
+﻿@using FlowerShop.Models
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
+          integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=ADLaM+Display&display=swap" rel="stylesheet">
+
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+            crossorigin="anonymous"></script>
+
+        
+        <link rel="stylesheet" href="~/Styles/base.css" />
+        <link rel="stylesheet" href="~/Styles/main.css" />
+        <link rel="stylesheet" href="~/Styles/layout.css" />
+        <link rel="stylesheet" href="~/Styles/admin.css" />
+    
+
+    <title>Admin</title>
+</head>
+
+<body>
+    @{
+        User currentUser = null;
+
+        if (Session["User"] != null) {
+            currentUser = (User)Session["User"];
+        } else {
+            currentUser = new User();
+            currentUser.UserName = "Undefined";
+            currentUser.Avatar = "AdminDefaultAvatar.png";
+
+        }
+    }
+
+    @{ 
+       // current route
+       string currentRoute = ViewContext.RouteData.Values["Controller"].ToString();
+    }
+    <nav id="sidebar" class="p-4">
+        <div>
+            <ul id="sidebar-list">
+                <li class="@(currentRoute == "Home" ? "bg-secondary" : "") rounded-10 mb-2">
+                    <a class="d-flex align-items-center w-100" href="/Admin/Home/Index">
+                        <i class='bx bx-home-alt-2'></i>
+                        <span class="ms-3">Trang chủ</span>
+                    </a>
+                </li>
+                <li class="@(currentRoute == "Product" ? "bg-secondary" : "") rounded-10 mb-2">
+                    <a class="d-flex align-items-center w-100" href="/Admin/Product/Index">
+                        <i class='bx bx-customize'></i>
+                        <span class="ms-3">Sản phẩm</span>
+                    </a>
+                </li>
+
+                <li class="@(currentRoute == "Order" ? "bg-secondary" : "") rounded-10 mb-2">
+                    <a class="d-flex align-items-center w-100" href="/Admin/Order/Index">
+                        <i class='bx bx-package'></i>
+                        <span class="ms-3">Đơn hàng</span>
+                    </a>
+                </li>
+                @*<li class="@(currentRoute == "Invoice" ? "bg-secondary" : "") rounded-10 mb-2">
+                    <a class="d-flex align-items-center w-100" href="/Admin/Invoice/Index">
+                        <i class='bx bx-receipt'></i>
+                        <span class="ms-3">Hóa đơn</span>
+                    </a>
+                </li>
+                <li class="@(currentRoute == "Customer" ? "bg-secondary" : "") rounded-10">
+                    <a class="d-flex align-items-center w-100" href="/Admin/Customer/Index">
+                        <i class='bx bx-group'></i>
+                        <span class="ms-3">Khách hàng</span>
+                    </a>
+                </li>*@
+            </ul>
+        </div>
+
+        <div class="bg-grey p-3 rounded-10 d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <img width="45px" height="45px" class="border rounded-pill" src="~/Assets/ImageStorage/Avatars/@currentUser.Avatar" alt="">
+                <div class="ms-3">
+                    <h6>
+                        @if (currentUser != null)
+            {
+                @currentUser.UserName
+                        } 
+                    </h6>
+                    <p class="text-desc">
+                        @if (Session["RoleName"] != null)
+            {
+                @Session["RoleName"]
+                        }
+                    </p>
+                </div>
+            </div>
+            <a title="Đăng xuất" class="fs-5 text-danger" href="/Account/Logout">
+                <i class='bx bx-log-out'></i>
+            </a>
+        </div>
+    </nav>
+    <div id="admin-content" class="p-4">
+        <div class="container-fluid">
+            @RenderBody()
+        </div>
+    </div>
+
+    <script src="@Url.Content("~/Scripts/jquery-3.7.1.min.js")"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+
+</html>

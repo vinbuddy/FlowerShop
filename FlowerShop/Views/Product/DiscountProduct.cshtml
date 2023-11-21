@@ -1,0 +1,75 @@
+﻿
+@using FlowerShop.Models
+
+@{
+    ViewBag.Title = "Discount Product";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    List<Product> products = ViewBag.products;
+    List<DiscountProduct> discountList = ViewBag.discountProducts;
+    discountList.Reverse();
+    var discountProducts = products.Where(pro => discountList.Any(dis => dis.ProductId == pro.Id));
+}
+<nav class="mb-4" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item "><a href="/Home/Index">Trang chủ</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Giảm giá</li>
+    </ol>
+</nav>
+<div class="row">
+
+    @if (discountProducts.Count() == 0)
+    {
+        <img class="d-block mx-auto" style="width: 300px" src="https://static.vecteezy.com/system/resources/previews/007/104/553/non_2x/search-no-result-not-found-concept-illustration-flat-design-eps10-modern-graphic-element-for-landing-page-empty-state-ui-infographic-icon-vector.jpg" />
+        <p class="mb-5 text-center">Không tìm thấy sản phẩm</p>
+    }
+    else
+    {
+        foreach (var product in discountProducts) {
+            <div class="col-3">
+                <div class="card rounded-30 p-3">
+                    <a class="card-img-wrapper position-relative" href="/Product/Detail/@product.Id">
+                        <img src="~/Assets/ImageStorage/Products/@product.Image"
+                             class="h-100 card-img-top rounded-20 object-fit-cover" alt="..." />
+                        @if (product.Quantity == 0)
+                        {
+                            <span style="top: 2px; right: 2px;" class="position-absolute px-3 py-2 rounded-pill shadow bg-grey border">
+                                Bán hết
+                            </span>
+                        }
+                    </a>
+                    <div class="d-flex flex-column justify-content-end flex-grow-1 mt-3">
+                        <div>
+                            <h5 class="card-title mb-1 text-truncate">
+                                @product.Name
+                            </h5>
+
+                            <p class="text-primary mb-2">
+                                @{ decimal disPrice = 0; }
+                                @foreach (var dis in discountList)
+                                {
+                                    if (dis.ProductId == product.Id)
+                                    {
+                                        disPrice = dis.DiscountPrice;
+                                        <span>@String.Format("{0:N}", dis.DiscountPrice) đ</span>
+                                    }
+                                }
+                                &nbsp;
+                                <span data-dis-price="@disPrice" class="text-decoration-line-through text-muted">@String.Format("{0:N}", product.Price) đ</span>
+                            </p>
+                        </div>
+
+                        <button @(product.Quantity == 0 ? "disabled" : null) data-id="@product.Id" class="add-to-cart btn text-white bg-primary rounded-pill">
+                            Thêm vào giỏ hàng
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        }
+    }
+
+</div>
+

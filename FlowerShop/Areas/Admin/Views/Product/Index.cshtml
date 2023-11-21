@@ -1,0 +1,273 @@
+﻿@model IEnumerable<FlowerShop.Models.Product>
+@{
+    ViewBag.Title = "Admin | Sản phẩm";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+@if (TempData["alert-success"] != null)
+{
+    <div class="d-flex align-items-center justify-content-between alert alert-success" role="alert">
+        <span>@TempData["alert-success"]</span>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["alert-error"] != null)
+{
+    <div class="d-flex align-items-center justify-content-between alert alert-danger" role="alert">
+        <span>@TempData["alert-error"]</span>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<!-- Modal delete -->
+<div class="modal fade" id="confirm-delete" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Xác nhận xóa</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="delete-product-form" action="" method="post" class="modal-footer">
+                <button type="button" class="btn bg-grey" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" class="btn btn-danger">Xóa</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal create discount -->
+<div class="modal fade" id="create-discount" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Tạo giảm giá</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="admin-form-inputs" class="row">
+                    <div class="col-6">
+                        <label class="form-label" for="">Giá gốc</label>
+                        <input readonly id="old-price-input" type="text" class="form-control shadow-none" value="0" />
+                    </div>
+
+                    <div class="col-6">
+                        <label class="form-label" for="">Giá mới</label>
+                        <input id="new-price-input" name="newPrice" type="text" class="form-control shadow-none" placeholder="Nhập giá mới" />
+                    </div>
+                </div>
+            </div>
+
+            <form id="create-discount-form" action="" method="post" class="modal-footer">
+                <button type="button" class="btn bg-grey" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" class="btn bg-dark text-white">Tạo giảm giá</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal delete discount -->
+<div class="modal fade" id="delete-discount" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Xóa giảm giá</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="delete-discount-form" action="" method="post" class="modal-footer">
+                <button type="button" class="btn bg-grey" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" class="btn bg-danger text-white">Xóa giảm giá</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<h4>Các sản phẩm</h4>
+<div class="d-flex align-items-center justify-content-between mt-4">
+    <a href="/Admin/Product/Create" class="d-flex align-items-center btn btn-dark rounded-5">
+        <span class="d-flex justify-content-center align-items-center bg-white text-dark rounded-pill">
+            <i class='bx bx-plus'></i>
+        </span>
+        <span class="ms-2">Thêm</span>
+    </a>
+    @using (Html.BeginForm("Index", "Product", FormMethod.Get)) { 
+        <div style="height: 40px; width: 300px;"  class="d-flex border p-1 rounded-3">
+            <input class="border-0 h-100 flex-grow-1 px-2" type="search" name="search" value="@ViewBag.searchvalue" placeholder="Tìm kiếm"/>
+            <button type="submit" class="bg-dark text-white rounded-2 px-3">
+                <i class="bx bx-search"></i>
+            </button>
+        </div>
+    }
+</div>
+
+<div id="admin-table-list" class="mt-5">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">Hình ảnh</th>
+                <th scope="col">Tên sản phẩm</th>
+                <th scope="col">Giá</th>
+                <th scope="col">Số lượng</th>
+                <th scope="col">Trạng thái</th>
+                <th scope="col">Nhà cung cấp</th>
+                <th scope="col">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in Model)
+            {
+                <tr>
+                    <td>
+                        <img width="55px" class="rounded-3" src="~/Assets/ImageStorage/Products/@product.Image" alt="">
+                    </td>
+                    <td>@product.Name</td>
+                    <td>
+                        <span class="product-item-price">
+                            @String.Format("{0:N}", product.Price) đ
+                        </span>
+                        @foreach (var discountProd in ViewBag.DiscountProducts)
+                        {
+                            if (product.Id == discountProd.ProductId)
+                            {
+                                <span class="ms-1 text-success">
+                                    @String.Format("{0:0.00}", discountProd.DiscountPrice) đ
+                                </span>
+                                break;
+                            }
+                        }
+                    </td>
+
+                    <td>@product.Quantity</td>
+                    <td>@product.Status</td>
+                    <td>
+                        @foreach (var sup in ViewBag.SupplierList)
+                        {
+                            if (sup.Id == product.SupplierId)
+                            {
+                                @sup.Name
+                            }
+                        }
+                    </td>
+                    <td>
+
+                        <a href="/Admin/Product/Detail/@product.Id" class="bg-secondary btn-sm rounded-4 me-2" data-bs-toggle="tooltip" data-bs-placement="left" title="Chi tiết">
+                            <i class='bx bx-show'></i>
+                        </a>
+                        <a href="/Admin/Product/Edit/@product.Id" class="bg-secondary btn-sm rounded-4 me-2" data-bs-toggle="tooltip" data-bs-placement="left" title="Chỉnh sửa">
+                            <i class='bx bx-pencil'></i>
+                        </a>
+                        @{ bool isDiscounted = false; }
+                        @foreach (var discountProd in ViewBag.DiscountProducts)
+                        {
+                            if (product.Id == discountProd.ProductId)
+                            {
+                                <button data-id="@product.Id" class="delete-discount-btn bg-secondary rounded-1 me-1" data-bs-toggle="modal" data-bs-target="#delete-discount">
+                                    <i class='bx bx-purchase-tag  pe-none' data-bs-toggle="tooltip" data-bs-placement="left" title="Tạo giảm giá"></i>
+                                </button>
+
+                                isDiscounted = true;
+                                break;
+                            }
+                        }
+                        @if (!isDiscounted) { 
+                        <button data-id="@product.Id" data-price="@String.Format("{0:0.00}", product.Price)" class="create-discount-btn bg-secondary rounded-1 me-1" data-bs-toggle="modal" data-bs-target="#create-discount">
+                            <i class='bx bx-purchase-tag  pe-none' data-bs-toggle="tooltip" data-bs-placement="left" title="Tạo giảm giá"></i>
+                        </button>
+                        
+                        }
+                        <button data-id="@product.Id" class="delete-product-btn bg-dark text-white rounded-1" data-bs-toggle="modal"
+                                data-bs-target="#confirm-delete">
+                            <i class='bx bx-trash pe-none'></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @*<nav class="d-flex justify-content-end mt-4" aria-label="Page navigation example">
+        <ul class="pagination">
+            <li class="page-item">
+                <a class="page-link" href="#">
+                    <i class='bx bx-chevron-left'></i>
+
+                </a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#">
+                    <i class='bx bx-chevron-right'></i>
+
+                </a>
+            </li>
+        </ul>
+    </nav>*@
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        // Iniit tooltip bootstrap
+        $(document).ready(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+
+        // Pass id to delete form
+        $(".delete-product-btn").click(function (e) {
+            let id = e.target.dataset.id
+            let url = `/Product/Delete/${id}`
+
+            $("#delete-product-form").attr("action", url)
+        })
+
+        function handleCreateDiscount() {
+            // Pass id to discount form
+            let id;
+            let newPrice = 0;
+            let submitBtn = $("#create-discount-form button[type=submit]")
+
+            $(".create-discount-btn").click(function (e) {
+                id = e.target.dataset.id
+                let price = e.target.dataset.price
+
+                $("#old-price-input").val(price)
+
+                // Disable btn when display modal
+                submitBtn.attr('disabled', 'disabled')
+
+                let url = `/Product/CreateDiscount?id=${id}`
+                $("#create-discount-form").attr("action", url)
+
+            })
+            $("input[name=newPrice]").on('input', function (e) {
+                let oldPriceValue = $("#old-price-input").val()
+                newPrice = e.target.value;
+
+                // Check valid newPrice vs oldPrice
+                // Check empty value
+                if (newPrice.length > 0) {
+                    submitBtn.removeAttr('disabled')
+                    if (newPrice == oldPriceValue)
+                        submitBtn.attr('disabled', 'disabled')
+                } else {
+                    submitBtn.attr('disabled', 'disabled')
+                }
+
+                let url = `/Product/CreateDiscount?id=${id}&newPrice=${newPrice}`
+                $("#create-discount-form").attr("action", url)
+            })
+        }
+        function handleDeleteDiscount() {
+            $(".delete-discount-btn").click(function (e) {
+                let id = e.target.dataset.id
+                let url = `/Product/DeleteDiscount/${id}`
+
+                $("#delete-discount-form").attr("action", url)
+            })
+        }
+        handleCreateDiscount()
+        handleDeleteDiscount()
+    </script>
+}
+

@@ -1,0 +1,175 @@
+﻿@model IEnumerable<FlowerShop.Models.OrderDetail>
+@{
+    ViewBag.Title = "OrderDetail";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+@{
+    string statusColor = "";
+    string statusIcon = "";
+
+    switch (ViewBag.order.Status)
+    {
+        case "Hoàn thành":
+            statusColor = "bagde-status-success";
+            statusIcon = "bx-check";
+            break;
+        case "Đang chờ":
+            statusColor = "bagde-status-pending";
+            statusIcon = "bx-time-five";
+            break;
+        case "Đang xử lý":
+            statusColor = "bagde-status-processing";
+            statusIcon = "bxs-bolt";
+            break;
+        case "Đang giao":
+            statusColor = "bagde-status-shipping";
+            statusIcon = "bxs-truck";
+            break;
+        case "Đã hủy":
+            statusColor = "bagde-status-cancel";
+            statusIcon = "bxs-x-circle";
+            break;
+        default:
+            break;
+    }
+}
+
+<h4>Chi tiết đơn hàng</h4>
+
+<nav aria-label="breadcrumb" class="mt-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item "><a href="/Admin/Home/Index">Trang chủ</a></li>
+        <li class="breadcrumb-item "><a href="/Admin/Order/Index">Đơn hàng</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Chi tiết đơn hàng</li>
+    </ol>
+</nav>
+
+<div id="admin-form-inputs" class="row mt-4">
+    <div class="col-12 mb-4">
+        <div class="h-100 border shadow-sm p-4 rounded-10">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h5>
+                    Đơn hàng #@ViewBag.order.Id
+                </h5>
+
+        <form action="/Order/UpdateOrderStatus/@ViewBag.order.Id" method="post" class="d-flex align-items-center">
+            <select name="status" class="form-select shadow-none" aria-label="Default select example">
+                <option value="Hoàn thành" selected="@(ViewBag.order.Status == "Hoàn thành")">Hoàn thành</option>
+                <option value="Đang xử lý" selected="@(ViewBag.order.Status == "Đang xử lý")">Đang xử lý</option>
+                <option value="Đang chờ" selected="@(ViewBag.order.Status == "Đang chờ")">Đang chờ</option>
+                <option value="Đang giao" selected="@(ViewBag.order.Status == "Đang giao")">Đang giao</option>
+                <option value="Đã hủy" selected="@(ViewBag.order.Status == "Đã hủy")">Đã hủy</option>
+            </select>
+            <button type="submit" class="btn btn-dark">OK</button>
+        </form>
+            </div>
+            <div class="d-flex align-items-center justify-content-between">
+                <span class="bagde-status @statusColor px-3 py-2 rounded-pill">
+                    <i class='text-size-small bx @statusIcon'></i> @ViewBag.order.Status
+                </span>
+                <div class=" d-flex align-items-center justify-content-between px-3 py-2 rounded-pill bg-grey">
+                    <p class="me-4">Ngày đặt: <span class="text-muted">@ViewBag.order.OrderDate</span></p>
+                    <p>Ngày giao: <span class="text-muted">@ViewBag.order.ReceiveDate</span>  <span class="text-muted">@ViewBag.order.ReceiveTime</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 mb-4 h-100">
+        <div class="h-100 border shadow-sm p-4 rounded-10">
+            <div class="row">
+                <div class="col-4">
+                    <h5>Khách hàng</h5>
+                    <div class="d-flex align-items-center mb-3">
+                        <img width="80" height="80" class="object-fit-cover rounded-pill mt-3" src="~/Assets/ImageStorage/Avatars/@ViewBag.user.Avatar" alt="">
+                        <div class="ms-3">
+                            <p class="mt-2 fw-bold">@ViewBag.user.UserName</p>
+                            <a class="text-decoration-underline" href="">@ViewBag.user.Email </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-5">
+                    <h5 class="mb-3">Thông tin giao hàng</h5>
+                    <p class="text-desc">
+                        Địa chỉ: <span class="text-dark">@ViewBag.shippingOrders.Address, @ViewBag.shippingOrders.Ward, @ViewBag.shippingOrders.District, @ViewBag.shippingOrders.City</span>
+                    </p>
+                    <p class="text-desc">Người nhận: <span class="text-dark">@ViewBag.shippingOrders.FullName</span></p>
+                    <p class="text-desc">SĐT: <span class="text-dark">@ViewBag.shippingOrders.PhoneNumber</span></p>
+                </div>
+                <div class="col-3">
+                    <h5 class="mb-3">Ghi chú</h5>
+                    <div class="d-flex align-items-center">
+                        <div class="me-2 py-1 px-2 bg-dark text-white rounded-5">
+                            <i class='bx bx-note'></i>
+                        </div>
+                        <p>@(ViewBag.order.Note.Trim().Length > 0 ? ViewBag.order.Note : "Không có ghi chú ")</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div id="admin-table-list" class="border shadow-sm p-4 rounded-10">
+            <table class="table">
+                <thead class="bg-grey">
+                    <tr>
+                        <th class="border-transparent" scope="col">Hình ảnh</th>
+                        <th class="border-transparent" scope="col">Tên sản phẩm</th>
+                        <th class="border-transparent" scope="col">Giá</th>
+                        <th class="border-transparent" scope="col">Số lượng</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var orderItem in Model) { 
+                    <tr>
+                        <td>
+                            <img width="55" class="rounded-5" src="~/Assets/ImageStorage/Products/@orderItem.ProductImage" alt="">
+                        </td>
+                        <td>@orderItem.ProductName</td>
+                        <td>
+                            <span>@String.Format("{0:N}", orderItem.TotalOrderPrice) đ</span>
+                        </td>
+
+                        <td>@orderItem.Quantity</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-end">
+                <div>
+                    <table class="table table-sm table-borderless text-end">
+                        <tbody>
+                            <tr>
+                                <th class="text-muted fw-normal text-start py-1 px-2">Số sản phẩm:</th>
+                                <td class="py-1 px-2"><span>@Model.Count()</span></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted fw-normal text-start py-1 px-2">Phí vận chuyển:</th>
+                                <td class="py-1 px-2"><span> @String.Format("{0:N}", ViewBag.order.ShippingCost) đ</span></td>
+                            </tr>
+                            <tr class="border-top">
+                                <th class="text-muted fw-normal text-start py-1 px-2">Tổng tiền:</th>
+                                <td class="py-1 px-2"><span class="fw-bold">@String.Format("{0:N}", ViewBag.order.TotalPayment) đ</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        // If you do not want to use jQuery you can use Pure JavaScript. See FAQ below
+        $(document).ready(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+
+            // Init popover
+            const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+            const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
+        });
+    </script>
+
+}
+

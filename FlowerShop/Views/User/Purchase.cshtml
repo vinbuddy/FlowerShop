@@ -1,0 +1,253 @@
+﻿@model IEnumerable<FlowerShop.Models.Order>
+@{
+    ViewBag.Title = "Purchase";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+@helper RenderOrders(string status = "")
+{
+    if (status == "")
+    {
+
+        if (Model.Count() == 0)
+        {
+            <img class="d-block mx-auto" style="filter: grayscale(1);" width="500"
+                 src="https://cdn.dribbble.com/users/357929/screenshots/2276751/orderup-emptystate-sadbag.png"
+                 alt="">
+        }
+        else
+        {
+            foreach (var order in Model)
+            {
+                <li class="p-3 bg-grey rounded-10 mb-4">
+                    <header class="d-flex justify-content-end pb-3 border-bottom mb-3">
+                        @{
+                            string statusColor = "";
+                            string statusIcon = "";
+
+                            switch (order.Status)
+                            {
+                                case "Hoàn thành":
+                                    statusColor = "bagde-status-success";
+                                    statusIcon = "bx-check";
+                                    break;
+                                case "Đang chờ":
+                                    statusColor = "bg-secondary";
+                                    statusIcon = "bx-time-five";
+                                    break;
+                                case "Đang xử lý":
+                                    statusColor = "bagde-status-processing";
+                                    statusIcon = "bxs-bolt";
+                                    break;
+                                case "Đang giao":
+                                    statusColor = "bagde-status-shipping";
+                                    statusIcon = "bxs-truck";
+                                    break;
+                                case "Đã hủy":
+                                    statusColor = "bagde-status-cancel";
+                                    statusIcon = "bxs-x-circle";
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        <span class="bagde-status @statusColor px-2 py-1 rounded-5 ms-3">
+                            <i class='text-size-small bx @statusIcon'></i> @order.Status
+                        </span>
+                    </header>
+                    @foreach (var orderList in ViewBag.orderItemList)
+                    {
+                        foreach (var orderItem in orderList)
+                        {
+                            if (orderItem.OrderId == order.Id)
+                            {
+                                <a href="" class="d-flex align-items-center justify-content-between pb-3">
+                                    <div class="d-flex align-items-center">
+                                        <img width="80" height="80" class="rounded-10 border"
+                                             src="~/Assets/ImageStorage/Products/@orderItem.ProductImage"
+                                             alt="">
+                                        <div class="ms-3">
+                                            <h6>@orderItem.ProductName</h6>
+                                            <p>x @orderItem.Quantity</p>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p class="text-dark ms-2">@String.Format("{0:N}", orderItem.TotalOrderPrice) đ</p>
+                                    </div>
+                                </a>
+                            }
+                        }
+                    }
+
+
+                    <div class="d-flex align-items-center justify-content-between pt-3  border-top">
+                        <div class="d-flex align-items-center">
+
+                            @if (order.Status == "Đang chờ" || order.Status == "Đang xử lý")
+                            {
+                                <a href="/User/CancelOrder/@order.Id" class="px-2 py-1 border outline-primary rounded-5 text-primary">Huỷ đơn hàng</a>
+                                
+                            }
+
+                        </div>
+                        <div>
+                            <p>Thành tiền: <span class="ms-3 fs-5 text-primary">@String.Format("{0:N}", order.TotalPayment) đ</span></p>
+                        </div>
+
+                    </div>
+                </li>
+            }
+        }
+    }
+    else
+    {
+        var ordersByStatus = Model.Where(order => order.Status == status);
+        if (ordersByStatus.Count() == 0)
+        {
+            <img class="d-block mx-auto" style="filter: grayscale(1);" width="500"
+                 src="https://cdn.dribbble.com/users/357929/screenshots/2276751/orderup-emptystate-sadbag.png"
+                 alt="">
+        }
+        else
+        {
+            foreach (var order in ordersByStatus)
+            {
+                <li class="p-3 bg-grey rounded-10 mb-4">
+                    <header class="d-flex justify-content-end pb-3 border-bottom mb-3">
+                        @{
+                            string statusColor = "";
+                            string statusIcon = "";
+
+                            switch (order.Status)
+                            {
+                                case "Hoàn thành":
+                                    statusColor = "bagde-status-success";
+                                    statusIcon = "bx-check";
+                                    break;
+                                case "Đang chờ":
+                                    statusColor = "bg-secondary";
+                                    statusIcon = "bx-time-five";
+                                    break;
+                                case "Đang xử lý":
+                                    statusColor = "bagde-status-processing";
+                                    statusIcon = "bxs-bolt";
+                                    break;
+                                case "Đang giao":
+                                    statusColor = "bagde-status-shipping";
+                                    statusIcon = "bxs-truck";
+                                    break;
+                                case "Đã hủy":
+                                    statusColor = "bagde-status-cancel";
+                                    statusIcon = "bxs-x-circle";
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        <span class="bagde-status @statusColor px-2 py-1 rounded-5 ms-3">
+                            <i class='text-size-small bx @statusIcon'></i> @order.Status
+                        </span>
+                    </header>
+                    @foreach (var orderList in ViewBag.orderItemList)
+                    {
+                        foreach (var orderItem in orderList)
+                        {
+                            if (orderItem.OrderId == order.Id)
+                            {
+                                <a href="" class="d-flex align-items-center justify-content-between pb-3">
+                                    <div class="d-flex align-items-center">
+                                        <img width="80" height="80" class="rounded-10 border"
+                                             src="~/Assets/ImageStorage/Products/@orderItem.ProductImage"
+                                             alt="">
+                                        <div class="ms-3">
+                                            <h6>@orderItem.ProductName</h6>
+                                            <p>x @orderItem.Quantity</p>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p class="text-dark ms-2">@String.Format("{0:N}", orderItem.TotalOrderPrice) đ</p>
+                                    </div>
+                                </a>
+                            }
+                        }
+                    }
+
+
+                    <div class="d-flex align-items-center justify-content-between pt-3  border-top">
+                        <div class="d-flex align-items-center">
+
+                            @if (order.Status == "Đang chờ" || order.Status == "Đang xử lý")
+                            {
+                                <a href="" class="px-2 py-1 border outline-primary rounded-5 text-primary">Huỷ đơn hàng</a>
+                            }
+
+                        </div>
+                        <div>
+                            <p>Thành tiền: <span class="ms-3 fs-5 text-primary">@String.Format("{0:N}", order.TotalPayment) đ</span></p>
+                        </div>
+
+                    </div>
+                </li>
+            }
+        }
+
+
+    }
+
+}
+
+<div id="user-orders">
+    <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Tất cả</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Đang chờ</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Đang xử lý</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="shipping-tab" data-bs-toggle="tab" data-bs-target="#shipping-tab-pane" type="button" role="tab" aria-controls="shipping-tab-pane" aria-selected="false">Đang giao</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="success-tab" data-bs-toggle="tab" data-bs-target="#success-tab-pane" type="button" role="tab" aria-controls="success-tab-pane" aria-selected="false">Hoàn thành</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="cancel-tab" data-bs-toggle="tab" data-bs-target="#cancel-tab-pane" type="button" role="tab" aria-controls="cancel-tab-pane" aria-selected="false">Đã hủy</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+            <ul>
+                @RenderOrders()
+            </ul>
+        </div>
+        <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+            <ul>
+                @RenderOrders("Đang chờ")
+            </ul>
+        </div>
+        <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
+            <ul>
+                @RenderOrders("Đang xử lý")
+            </ul>
+        </div>
+        <div class="tab-pane fade" id="shipping-tab-pane" role="tabpanel" aria-labelledby="shipping-tab" tabindex="0">
+            <ul>
+                @RenderOrders("Đang giao")
+            </ul>
+        </div>
+        <div class="tab-pane fade" id="success-tab-pane" role="tabpanel" aria-labelledby="success-tab" tabindex="0">
+            <ul>
+                @RenderOrders("Hoàn thành")
+            </ul>
+        </div>
+        <div class="tab-pane fade" id="cancel-tab-pane" role="tabpanel" aria-labelledby="cancel-tab" tabindex="0">
+            <ul>
+                @RenderOrders("Đã hủy")
+            </ul>
+        </div>
+
+    </div>
+</div>

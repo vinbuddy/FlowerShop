@@ -1,0 +1,104 @@
+﻿@model FlowerShop.Models.Product
+@using FlowerShop.Models
+@{
+    ViewBag.Title = "Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    User currentUser = null;
+
+    if (Session["User"] != null)
+    {
+        currentUser = (User)Session["User"];
+    }
+
+}
+
+<nav class="mb-4" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item "><a href="/Home/Index">Trang chủ</a></li>
+        <li class="breadcrumb-item "><a href="/Product/Shop/0">Sản phẩm</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+    </ol>
+</nav>
+<div class="row">
+    <div class="col-5">
+        <img style="max-height: 503px;" class="w-100 rounded-20 object-fit-cover"
+             src="~/Assets/ImageStorage/Products/@Model.Image">
+    </div>
+
+    <div class="col-7">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 style="font-size: 50px;" class="">@Model.Name</h5>
+            @if (Model.Quantity == 0)
+            {
+                <span class=" px-3 py-2 rounded-pill shadow bg-grey border">
+                    Bán hết
+                </span>
+            }
+        </div>
+        <div class="d-flex align-items-center mb-3">
+                <h5 class="fs-4 text-primary">
+                    @{ bool isDiscounted = false; }
+
+                    @foreach (var dis in ViewBag.discountProducts)
+                    {
+                        if (dis.ProductId == Model.Id)
+                        {
+                            <span>@String.Format("{0:N}", dis.DiscountPrice) đ</span>
+                            isDiscounted = true;
+                        }
+                    }
+
+                    &nbsp;
+                </h5>
+                <span class="@(isDiscounted ? "text-decoration-line-through text-muted fs-5" : "fs-4 text-primary") ">@String.Format("{0:N}", Model.Price) đ</span>
+
+        </div>
+
+        <p style="color: #777;" class="fs-6">@Model.Description</p>
+        <div class="d-flex align-items-center mt-4 ">
+            <div class="d-flex align-items-center border rounded-5 me-3">
+                <button class="decrease-btn btn btn-lg fs-6">
+                    <i class='bx bx-minus'></i>
+                </button>
+                <div class="quantity-select-value">
+                    1
+                </div>
+                <button class="increase-btn btn btn-lg fs-6">
+                    <i class='bx bx-plus'></i>
+                </button>
+            </div>
+            <button  @(Model.Quantity == 0 ? "disabled" : null) data-id="@Model.Id" class="add-to-cart btn btn-lg fs-6 bg-primary text-white">
+                Thêm vào giỏ hàng
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="my-4">
+    <div class="mt-4">
+        <div class="pt-4 shadow-sm rounded-10">
+            <h5 class="mb-3">Có thể bạn thích</h5>
+            <div class="row">
+                @foreach (var product in ViewBag.suggestionProducts)
+                {
+                    <div class="col-3 mb-4 ">
+                        <a href="/Product/Detail/@product.Id" class="w-100  rounded-10 d-inline-block h-100" style="border: 1px solid #ccc" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='#ccc'">
+                            <img class="w-100 h-100 object-fit-cover rounded-10"
+                                src="~/Assets/ImageStorage/Products/@product.Image">
+                            
+                        </a>
+                    </div>
+            }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="module" src="~/JS/Detail.js"></script>
+    <script type="module" src="~/JS/Index.js"></script>
+
+}

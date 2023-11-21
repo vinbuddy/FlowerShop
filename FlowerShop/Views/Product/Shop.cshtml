@@ -1,0 +1,177 @@
+﻿@model IEnumerable<FlowerShop.Models.Product>
+@{
+    ViewBag.Title = "Shop";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item "><a href="/Home/Index">Trang chủ</a></li>
+        <li class="breadcrumb-item "><a href="/Product/Shop/0">Sản phẩm</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Tất cả</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-3">
+        <aside style="background-color: #fff; max-height: calc(100vh - 130px); overflow-y: overlay; top: 130px;"
+               class="p-3 shadow position-sticky rounded-10 use-scrollbar" id="filter-sidebar">
+
+            <form method="get" action="/Product/Shop/@ViewBag.currentCateId?sortByPrice=@ViewBag.currentSortByPrice" class="d-flex align-items-center border-bottom py-2">
+                <input class="border-0 h-100 flex-grow-1 px-2" type="search"
+                       placeholder="Tìm kiếm sản phẩm" name="search" />
+                <button type="submit" class="bg-primary text-white rounded-2 py-1 px-3">
+                    <i class="bx bx-search"></i>
+                </button>
+            </form>
+
+            <h5 class="fs-6 my-3">Các Danh Mục</h5>
+            <ul class="rounded-10 list-group">
+                <li class="list-group-item">
+                    <a class="@(ViewBag.currentCateId == 0 ? "text-primary" : "")" href="/Product/Shop/0">Tất cả</a>
+                </li>
+                @foreach (var category in ViewBag.categories)
+                {
+                    <li class="list-group-item">
+                        <a class="@(ViewBag.currentCateId == category.Id ? "text-primary" : "")"  href="/Product/Shop/@category.Id">@category.CategoryName</a>
+                    </li>
+                }
+            </ul>
+            <h5 class="fs-6 mt-3">Sắp Xếp giá</h5>
+            <form id="sort-by-form" method="get" action="/Product/Shop/@ViewBag.currentCateId" class="p-3">
+                <div class="mb-1">
+                    <input @( ViewBag.currentSortByPrice == "desc" ? "checked" : "" ) class="accent-color-primary" type="radio" value="desc" name="sortByPrice" id="min-price">
+                    <label class="ms-2" for="min-price">Thấp</label>
+                </div>
+                <div>
+                    <input @( ViewBag.currentSortByPrice == "asc" ? "checked" : "" ) class="accent-color-primary" type="radio" value="asc" name="sortByPrice" id="max-price">
+                    <label class="ms-2" for="max-price">Cao</label>
+                </div>
+            </form>
+        </aside>
+    </div>
+    <div class="col-9">
+        <div class="row">
+            @foreach (var product in Model)
+            {
+                <div class="col-4 mb-4 h-100">
+                    <div class="card rounded-30 p-3 h-100">
+                        <a class="card-img-wrapper position-relative" href="/Product/Detail/@product.Id">
+                            <img src="~/Assets/ImageStorage/Products/@product.Image"
+                                 class="card-img-top rounded-20 h-100 object-fit-cover" alt="product image" />
+                            @if (product.Quantity == 0)
+                            {
+                                <span style="top: 2px; right: 2px;" class="position-absolute px-3 py-2 rounded-pill shadow bg-grey border">
+                                    Bán hết
+                                </span>
+                            }
+                        </a>
+                        <div class="d-flex flex-column justify-content-end flex-grow-1">
+                            <div>
+                                <h5 class="card-title mt-1 mb-1 text-truncate">
+                                    @product.Name
+                                </h5>
+
+
+                                <p class="text-primary mb-2">
+                                    @{ bool isDiscounted = false; }
+                                    @foreach (var dis in ViewBag.discountProducts)
+                                    {
+                                        if (dis.ProductId == product.Id)
+                                        {
+                                            <span>@String.Format("{0:N}", dis.DiscountPrice) đ &nbsp;</span>
+                                            isDiscounted = true;
+                                        }
+                                    }
+                                    
+                                    <span class="@(isDiscounted ? "text-decoration-line-through text-muted" : "text-primary") ">@String.Format("{0:N}", product.Price) đ</span>
+                                </p>
+                            </div>
+
+                             <button data-id="@product.Id" @(product.Quantity == 0 ? "disabled" : null) class="add-to-cart btn text-white bg-primary rounded-pill">Thêm vào giỏ hàng</button> 
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (Model.Count() == 0)
+            {
+                <img class="d-block mx-auto" style="width: 300px" src="https://static.vecteezy.com/system/resources/previews/007/104/553/non_2x/search-no-result-not-found-concept-illustration-flat-design-eps10-modern-graphic-element-for-landing-page-empty-state-ui-infographic-icon-vector.jpg" />
+                <p class="mb-5 text-center">Không tìm thấy sản phẩm</p>
+            }
+
+            @if (Model.Count() != 0)
+            {
+                <div class="col-12">
+                    <nav id="shop-pagination-bar" aria-label="Page navigation example">
+                        @{
+                            bool isDisabledPrev = false;
+                            bool isDisabledNext = false;
+                            int prevPage = ViewBag.currentPage - 1;
+                            int nextPage = ViewBag.currentPage + 1;
+
+
+                            if (prevPage <= 0)
+                            {
+                                isDisabledPrev = true;
+                            }
+
+                            if (nextPage > ViewBag.pageSize)
+                            {
+                                isDisabledNext = true;
+                            }
+                        }
+
+                        @{ 
+
+                            int totalPages = ViewBag.pageSize;
+                            int range = 2;
+                            int currentPage = ViewBag.currentPage;
+
+                            int start = Math.Max(1, totalPages - 2 * range);
+                            int end = Math.Max(1, currentPage - range);
+
+                            int from = Math.Min(start, end);
+                            int to = range * 2 + 1;
+
+                            IList<int> pages = Enumerable
+                                .Range(from, to)
+                                .TakeWhile(p => p <= totalPages)
+                                .ToList();
+                        }
+
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item page-item @(isDisabledPrev ? "disabled" : "")">
+                                <a href="/Product/Shop/@ViewBag.currentCateId?sortByPrice=@ViewBag.currentSortByPrice&page=@prevPage&search=@ViewBag.search" class="page-link">Previous</a>
+                            </li>
+                            @foreach (var i in pages)
+                            {
+                                bool isActive = i == ViewBag.currentPage;
+                                <li class="page-item  @(isActive ? "active" : "")">
+                                    <a class="page-link" href="/Product/Shop/@ViewBag.currentCateId?sortByPrice=@ViewBag.currentSortByPrice&page=@i&search=@ViewBag.search">@i</a>
+                                </li>
+
+                            }
+                            <li class="page-item @(isDisabledNext ? "disabled" : "")">
+                                <a class="page-link" href="/Product/Shop/@ViewBag.currentCateId?sortByPrice=@ViewBag.currentSortByPrice&page=@nextPage&search=@ViewBag.search">Next</a>
+                            </li>
+                        </ul>
+                        
+                    </nav>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).on("click", "input[name=sortByPrice]", function () {
+            if ($(this).is(':checked')) {
+                $('#sort-by-form').submit();
+            }
+        });
+    </script>    
+}

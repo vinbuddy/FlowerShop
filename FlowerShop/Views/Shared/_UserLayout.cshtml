@@ -1,0 +1,237 @@
+﻿@using FlowerShop.Models
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
+          integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=ADLaM+Display&display=swap" rel="stylesheet">
+
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+            crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="~/Styles/base.css" />
+    <link rel="stylesheet" href="~/Styles/main.css" />
+    <link rel="stylesheet" href="~/Styles/layout.css" />
+    <title></title>
+</head>
+<body>
+    @{
+        User currentUser = null;
+
+        if (Session["User"] != null)
+        {
+            currentUser = (User)Session["User"];
+        }
+
+    }
+
+    @{
+        // current route
+        string currentRoute = ViewContext.RouteData.Values["Controller"].ToString() + ViewContext.RouteData.Values["Action"].ToString();
+    }
+    <main>
+        <header id="header">
+            <nav class="bg-primary py-1">
+                <div class="container h-100">
+                    <div class="d-flex justify-content-end align-items-center">
+                        @if (currentUser != null)
+                        {
+                            <div data-uid="@currentUser.Id" id="user-info" class="d-flex align-items-center text-dark rounded-pill px-2 py-1 bg-grey me-3">
+                                <img width="20" height="20" class="object-fit-cover me-1 rounded-circle" src="~/Assets/ImageStorage/Avatars/@currentUser.Avatar" />
+                                <a href="/User/Profile" class="text-dark text-size-sm">@currentUser.UserName</a>
+                            </div>
+                            <a style="border-color: white" class="rounded-pill px-3 py-1 text-white border text-size-sm d-flex align-items-center" href="/Account/Logout">
+                                <span>Đăng xuất</span>
+                                <i style="top: 1px" class='position-relative bx bx-log-out-circle ms-2'></i>
+                            </a>
+                        }
+                        else
+                        {
+                            <a class="text-white text-size-sm me-3" href="/Account/Login">Đăng nhập</a>
+                            <a class="text-white text-size-sm" href="/Account/Register">Đăng ký</a>
+                        }
+                    </div>
+                </div>
+            </nav>
+            <nav class="bg-white main-nav shadow-sm">
+                <div class="h-100 d-flex justify-content-between align-items-center container">
+                    <a href="/Home/Index">
+                        <h3><span class="text-primary font-heading-decor">Flower</span>Shop</h3>
+                    </a>
+
+
+                    <form method="get" action="/Product/Shop/0" id="search-bar" class="searchbar d-flex ms-3 border p-1 rounded-3 position-relative">
+                        <input class="border-0 h-100 flex-grow-1 px-2" type="search" name="search" autocomplete="off" placeholder="Tìm kiếm" />
+                        <button class="bg-primary text-white rounded-2 px-3">
+                            <i class="bx bx-search"></i>
+                        </button>
+
+                        <div id="result" style="top: calc(100% + 10px); display: none;" class="py-3 w-100 bg-white rounded-5 position-absolute start-0 border shadow">
+                            <ul id="result-list" style="list-style: none;">
+                                @*Render search here*@
+                            </ul>
+                        </div>
+
+                        <div id="search-loading-bar"></div>
+                    </form>
+
+
+                    <ul id="nav-list" class="d-flex align-items-center">
+                        <li class="me-4">
+                            <a class="@(currentRoute == "ProductShop" ? "text-primary" : "")" href="/Product/Shop/0">Sản phẩm</a>
+                        </li>
+                        <li class="me-4">
+                            <a class="@(currentRoute == "ProductDiscountProduct" ? "text-primary" : "")" href="/Product/DiscountProduct">Giảm giá</a>
+                        </li>
+                        <li class="dropdown me-4">
+                            <a class="dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button"
+                               data-bs-offset="0,12" data-bs-toggle="dropdown" aria-expanded="false">
+                                Danh mục
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDarkDropdownMenuLink">
+                                @foreach (var category in ViewBag.categories)
+                                {
+                                    <li><a class="dropdown-item" href="/Product/Shop/@category.Id">@category.CategoryName</a></li>
+
+                                }
+                            </ul>
+                        </li>
+
+                        <li class="fs-4 position-relative">
+                            <a class="@(currentRoute == "CartShowCart" ? "text-primary" : "")" href="/Cart/ShowCart">
+                                <i class='bx bx-shopping-bag'></i>
+                            </a>
+                            <span id="cart-quantity" class="text-size-mini position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                                0
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+        <div id="content" class="container">
+            <div class="row">
+                <div class="col-3">
+                    <div class="p-3  rounded-10">
+                        <div style="border-bottom: 1px solid #eee;" class="d-flex align-items-center pb-3">
+                            <img width="50" height="50" class="object-fit-cover rounded-pill border "
+                                 src="~/Assets/ImageStorage/Avatars/@currentUser.Avatar" alt="">
+                            <div class="ms-3">
+                                <h6>@currentUser.UserName</h6>
+                            </div>
+                        </div>
+
+                        <ul class="pt-2">
+                            <li class="mt-2">
+                                <a href="/User/Profile" class="@(currentRoute == "UserProfile" ? "text-primary" : "") d-flex align-items-center">
+                                    <i class='bx bx-user'></i>
+                                    <span class="ms-3">Tài khoản của tôi</span>
+                                </a>
+                            </li>
+                            <li class="mt-2">
+                                <a href="/User/Purchase" class="@(currentRoute == "UserPurchase" ? "text-primary" : "") d-flex align-items-center">
+                                    <i class='bx bx-package'></i>
+                                    <span class="ms-3">Đơn mua</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+                <div class="col-9">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+
+        <footer class="text-center text-lg-start bg-light ">
+            <section class="py-4">
+                <div class="container text-center text-md-start mt-5">
+                    <div class="row mt-3">
+                        <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
+                            <h3 class="text-black mb-4">
+                                <span class="text-primary font-heading-decor">Flower</span>Shop
+                            </h3>
+                            <p>
+                                Hoa tươi, chất lượng, giao hàng nhanh chóng - Nơi bạn gửi trọn yêu thương
+                            </p>
+                        </div>
+                        <div class="col-md-2 col-lg-2 col-xl-2 mx-auto text-muted mb-4">
+                            <h6 class="text-uppercase fw-bold mb-4">
+                                Dịp
+                            </h6>
+                            <p class="mb-2">
+                                <a href="/Product/Shop/7" class="text-reset">Tốt nghiệp</a>
+                            </p>
+                            <p class="mb-2">
+                                <a href="/Product/Shop/1" class="text-reset">Sinh nhật</a>
+                            </p>
+                            <p class="mb-2">
+                                <a href="/Product/Shop/8" class="text-reset">Kỷ niệm</a>
+                            </p>
+                            <p class="mb-2">
+                                <a href="/Product/Shop/6" class="text-reset">Tình yêu</a>
+                            </p>
+                        </div>
+                        <div class="col-md-3 col-lg-2 col-xl-2 mx-auto text-muted mb-4">
+                            <h6 class="text-uppercase fw-bold mb-4">
+                                Hoa
+                            </h6>
+                            <p class="mb-2">
+                                <a href="/Product/Shop/3" class="text-reset">Hoa tươi</a>
+                            </p>
+                            <p class="mb-2">
+                                <a href="/Product/Shop/2" class="text-reset">Hoa cưới</a>
+                            </p>
+                            <p class="mb-2">
+                                <a href="/Product/Shop/4" class="text-reset">Hoa hồng</a>
+                            </p>
+                        </div>
+                        <div class="col-md-4 col-lg-3 col-xl-3 mx-auto text-muted mb-md-0 mb-4">
+                            <h6 class="text-uppercase fw-bold mb-4">Liên hệ</h6>
+                            <p class="mb-2"><i class='bx bxs-map'></i> HUIT, TP. HCM</p>
+                            <p class="mb-2">
+                                <i class='bx bxs-envelope'></i>
+                                flowershop@gmail.com
+                            </p>
+                            <p class="mb-2"><i class='bx bxs-phone'></i> 84+ 01 234 567 88</p>
+                            <p class="mb-2">
+                                <a class="text-muted" href="">
+                                    <i class='bx bxl-instagram-alt'></i>
+                                    Instagram
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="text-center p-4" style="background-color: rgba(0, 0, 0, 0.05);">
+                © 2023 FlowerShop:
+                <a class="text-reset fw-bold" href="#">Flowershop.com</a>
+            </div>
+        </footer>
+    </main>
+
+    <script src="@Url.Content("~/Scripts/jquery-3.7.1.min.js")"></script>
+    <script type="module" src="~/JS/Index.js"></script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

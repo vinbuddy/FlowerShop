@@ -1,0 +1,273 @@
+﻿@{
+    ViewBag.Title = "ShowCheckout";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model FlowerShop.Models.ShippingOrder
+
+
+@if (TempData["error-message"] != null)
+{
+    <div class="d-flex align-items-center justify-content-between alert alert-danger" role="alert">
+        <span>@TempData["error-message"]</span>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item "><a href="./index.html">Trang chủ</a></li>
+        <li class="breadcrumb-item "><a href="./index.html">Giỏ hàng</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Thanh toán</li>
+    </ol>
+</nav>
+
+<form action="/Checkout/CreateOrder" method="post">
+    <!-- Address -->
+    <div class="p-4 bg-grey mt-4 rounded-10">
+        <div class="d-flex align-items-center justify-content-between">
+            <h5 class="text-primary">Thông tin giao hàng</h5>
+        </div>
+        <div class="mt-3">
+            <div class="row">
+                <div class="col-6">
+                    <input name="FullName" class="border rounded-5 form-control shadow-none w-100" type="text" placeholder="Nhập họ tên">
+                </div>
+                <div class="col-6">
+                    <input name="PhoneNumber" class="border rounded-5 form-control shadow-none w-100" type="text" placeholder="Nhập số điện thoại">
+
+                </div>
+                <div class="col-6 mt-3">
+                    <input name="Address" class="border rounded-5 form-control shadow-none w-100" type="text" placeholder="Nhập địa chỉ nhà">
+
+                </div>
+                <div class="col-6 mt-3">
+                    <div class="row">
+                        <div class="col-4">
+                            <select id="city" class="form-select select-address shadow-none" aria-label="Default select example">
+                                <option value="" selected>Chọn tỉnh thành</option>
+                            </select>
+                            <select name="City" hidden>
+                                    <option value="" selected></option>
+                                </select>
+                        </div>
+                        <div class="col-4">
+                            <select id="district" class="form-select select-address shadow-none" aria-label="Default select example">
+                                <option value="" selected>Chọn quận huyện</option>
+                            </select>
+                            <select name="District" hidden>
+                                    <option value="" selected></option>
+                                </select>
+                        </div>
+                        <div class="col-4">
+                            <select id="ward" class="form-select select-address shadow-none" aria-label="Default select example">
+                                <option value="" selected>Chọn phường xã</option>
+                            </select>
+
+                            <select name="Ward" hidden>
+                                    <option value="" selected></option>
+                                </select>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Selected item -->
+    <div style="border-top-left-radius: 10px; border-top-right-radius: 10px;" class="p-4 border mt-5">
+        <div>
+            <div class="row">
+                <div class="col-6">
+                    <h5>Sản phẩm</h5>
+                </div>
+                <div class="col-2">
+                    <span class="text-muted">Đơn giá</span>
+                </div>
+                <div class="col-2">
+                    <span class="text-muted">Số lượng</span>
+                </div>
+                <div class="col-2">
+                    <span class="text-muted">Thành tiền</span>
+                </div>
+
+            </div>
+        </div>
+        <div>
+            <div class="row">
+                @{ decimal totalPriceItems = 0; }
+                @foreach (var cartItem in ViewBag.selectedItems)
+                {
+                    if (cartItem.ProductDiscountPrice != 0)
+                    {
+                        totalPriceItems += cartItem.TotalDiscount;
+                    }
+                    else
+                    {
+                        totalPriceItems += cartItem.TotalPriceItem;
+
+                    }
+                    <div class="col-12 mt-4">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <img class="border rounded-10 object-fit-cover" width="70"
+                                         src="~/Assets/ImageStorage/Products/@cartItem.ProductImage"
+                                         alt="">
+                                    <p class="ms-3">@cartItem.ProductName</p>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="d-flex flex-column justify-content-center h-100">
+                                    <span>@(cartItem.ProductDiscountPrice != 0 ? String.Format("{0:N}", cartItem.ProductDiscountPrice) : String.Format("{0:N}", cartItem.ProductPrice)) đ</span>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="d-flex flex-column justify-content-center h-100">
+                                    <span>@cartItem.Quantity</span>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="d-flex flex-column justify-content-center h-100">
+                                    <span>@(cartItem.ProductDiscountPrice != 0 ? String.Format("{0:N}", cartItem.TotalDiscount) : String.Format("{0:N}", cartItem.TotalPriceItem)) đ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+    <div style="border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;" class="p-4 border bg-grey">
+        <div class="row">
+            <div class="col-6">
+                <div>
+                    <label class="me-3" for="">Lời nhắn: </label>
+                    <input name="Note" class="border py-2 px-3 rounded-5" type="text" placeholder="Lưu ý cho người bán">
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="d-flex justify-content-end align-items-center h-100">
+                    <p class="me-5 text-muted">Tổng số tiền <span>(@Enumerable.Count(ViewBag.selectedItems)) sản phẩm</span></p>
+                    <p>@totalPriceItems đ</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shipping Date -->
+    <div class="p-4 rounded-10 border mt-5">
+        <div>
+            <div class="mb-4">
+                <h6 class="text-dark">Chọn ngày giao hàng</h6>
+                <div class="mt-3">
+                    <input id="RecieveDate" hidden type="date" name="ReceiveDate" />
+                    <div class="d-flex align-items-center">
+                        <label id="current-date" for="#RecieveDate"
+                               class="active date-label cursor-pointer bg-white p-2 border rounded-5 me-3 cursor-pointer">
+
+                        </label>
+                        <div id="date-list" class="d-flex align-items-center">
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div>
+                <h6 class="text-dark">Chọn thời gian giao hàng</h6>
+                <div class="mt-3">
+                    <input id="RecieveTime" hidden type="text" name="ReceiveTime" />
+
+                    <div id="time-list" class="d-flex align-items-center flex-wrap">
+                        <label for=""
+                               class="active time-label cursor-pointer bg-white p-2 border rounded-5 me-3 cursor-pointer">
+                            8h - 10h
+                        </label>
+                        <label for="" class="time-label cursor-pointer bg-white p-2 border rounded-5 me-3">
+                            9h - 10h
+                        </label>
+                        <label for="" class="time-label cursor-pointer bg-white p-2 border rounded-5 me-3 cursor-pointer">
+                            10h - 12h
+                        </label>
+                        <label for="" class="time-label cursor-pointer bg-white p-2 border rounded-5 me-3">
+                            11h - 13h
+                        </label>
+                        <label for=""
+                               class="time-label cursor-pointer bg-white p-2 border rounded-5 me-3 cursor-pointer">
+                            12h - 14h
+                        </label>
+                        <label for="" class="time-label cursor-pointer bg-white p-2 border rounded-5 me-3">
+                            13h - 15h
+                        </label>
+                        <label for="" class="time-label cursor-pointer bg-white p-2 border rounded-5 me-3 cursor-pointer">
+                            14h - 16h
+                        </label>
+                        <label for="" class="time-label cursor-pointer bg-white p-2 border rounded-5 me-3">
+                            15h - 17h
+                        </label>
+                        <label for="" class="time-label cursor-pointer bg-white p-2 border rounded-5 me-3">
+                            16h - 18h
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+
+    <!-- Summary + Checkout -->
+    <div class="border rounded-10 mt-5">
+        <div class="p-4">
+            <h5>Thanh Toán</h5>
+            <div class="row">
+                <div class="col-9">
+                    <input hidden type="text" name="UserId" value="@Session["UserId"]" />
+                </div>
+                <div class="col-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <p>Tổng tiền hàng</p>
+                        <input hidden id="total-price-items" value="@totalPriceItems" />
+                        <p>@String.Format("{0:N}", totalPriceItems) đ</p>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <input hidden type="text" name="ShippingCost" value="" />
+                        <p>Phí vận chuyển</p>
+                        <p id="shipping-cost">29.00 đ</p>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <p>Tổng thanh toán</p>
+                        <input hidden type="text" name="TotalPayment" value="" />
+                        <p id="total-payment" class="text-primary fs-5 fw-bold"></p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div style="border-top: 1px dashed #ddd;" class="p-4">
+            <div class="row">
+                <div class="col-9">
+                    <div class="d-flex align-items-center h-100">
+                        <p class="text-muted">Vui lòng kiểm tra thông tin trước khi đặt hàng</p>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <button type="submit" class="btn btn-lg w-100 bg-primary text-white">Đặt hàng</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</form>
+
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script src="~/JS/Checkout.js"></script>
+}
