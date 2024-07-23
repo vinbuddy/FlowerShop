@@ -1,5 +1,6 @@
 # Flower Shop
-![Flowershop-Homepage](https://github.com/vinbuddy/FlowerShop/assets/94288269/e13bd5c9-e363-4d86-a033-3c3612557336)
+![70_1x_shots_so](https://github.com/user-attachments/assets/6cdb33e2-8bab-458d-b81b-eec49ea0c1ad)
+
 ## Technology used
  - C# + Asp net MVC
  - Web API
